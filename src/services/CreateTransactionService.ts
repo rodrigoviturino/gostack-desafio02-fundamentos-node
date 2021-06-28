@@ -15,13 +15,18 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Request): Transaction {
-    const createdTransaction = this.transactionsRepository.create({
+    const balance = this.transactionsRepository.getBalance();
+    if (type === 'outcome' && balance.total < value) {
+      throw new Error('Você não tem saldo suficiente!');
+    }
+
+    const transaction = this.transactionsRepository.create({
       title,
       value,
       type,
     });
 
-    return createdTransaction;
+    return transaction;
   }
 }
 

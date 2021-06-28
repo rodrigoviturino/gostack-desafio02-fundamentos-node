@@ -6,7 +6,7 @@ interface Balance {
   total: number;
 }
 
-interface TransactionDTO {
+interface CreateTransactionDTO {
   title: string;
   value: number;
   type: 'income' | 'outcome';
@@ -24,10 +24,27 @@ class TransactionsRepository {
   }
 
   public getBalance(): Balance {
-    // TODO
+    const balance = this.transactions.reduce(
+      (acc, transaction) => {
+        const result = acc;
+        if (transaction.type === 'income') {
+          result.income += transaction.value;
+        } else if (transaction.type === 'outcome') {
+          result.outcome += transaction.value;
+        }
+        return result;
+      },
+      {
+        income: 0,
+        outcome: 0,
+        total: 0,
+      },
+    );
+    balance.total = balance.income - balance.outcome;
+    return balance;
   }
 
-  public create({ title, value, type }: TransactionDTO): Transaction {
+  public create({ title, value, type }: CreateTransactionDTO): Transaction {
     // Interação com o Banco
     const transaction = new Transaction({ title, value, type });
 
